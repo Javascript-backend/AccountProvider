@@ -17,7 +17,7 @@ namespace AccountProvider.Functions
     {
         private readonly ILogger<SignUp> _logger = logger;
         private readonly UserManager<UserAccount> _userManager = userManager;
-        private Encoding? encoding;
+        
 
         [Function("SignUp")]
         public async Task <IActionResult> Run([HttpTrigger(AuthorizationLevel.Function,"post")] HttpRequest req)
