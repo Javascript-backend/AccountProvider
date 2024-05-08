@@ -44,10 +44,10 @@ namespace AccountProvider.Functions
                 {
                     try
                     {
-                        string verificationProviderUrl = Environment.GetEnvironmentVariable("VerificationProviderUrl")!;
+                        string vProviderUrl = Environment.GetEnvironmentVariable("VProviderUrl")!;
                         using var http = new HttpClient();
                         StringContent content = new StringContent(JsonConvert.SerializeObject(new {vr}), Encoding.UTF8, "application/json");
-                        var response = await http.PostAsync(verificationProviderUrl, content);
+                        var response = await http.PostAsync(vProviderUrl, content);
 
                         if (response.IsSuccessStatusCode)
                         {
