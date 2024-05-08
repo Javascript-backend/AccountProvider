@@ -44,9 +44,10 @@ namespace AccountProvider.Functions
                 {
                     try
                     {
+                        string verificationProviderUrl = Environment.GetEnvironmentVariable("VerificationProviderUrl")!;
                         using var http = new HttpClient();
                         StringContent content = new StringContent(JsonConvert.SerializeObject(new {vr}), Encoding.UTF8, "application/json");
-                        var response = await http.PostAsync("https://verification-provider-cl.azurewebsites.net/api/validate?code=szi1Nv-wXgX8xDBMWGCOzdOuFViW41y332NSHtFLEl-5AzFu0TeQ2w==", content);
+                        var response = await http.PostAsync(verificationProviderUrl, content);
 
                         if (response.IsSuccessStatusCode)
                         {

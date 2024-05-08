@@ -59,6 +59,8 @@ namespace AccountProvider.Functions
                             UserName = urr.Email
                         };
 
+                        string serviceBusConnectionString = Environment.GetEnvironmentVariable("ServiceBusConnectionString")!;
+                        string serviceBusQueueName = "verification_request";
                         
                         var result = await _userManager.CreateAsync(userAccount, urr.Password);
                         if (result.Succeeded)
@@ -66,8 +68,8 @@ namespace AccountProvider.Functions
                             try
                             {
                                     
-                                ServiceBusClient client = new ServiceBusClient("Endpoint=sb://sb-silicon-cl.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=zr3cIzDdQLLGXR/bV6OCctAZaH8bgGRBG+ASbDYM5VY=");
-                                ServiceBusSender sender = client.CreateSender("verification_request");
+                                ServiceBusClient client = new ServiceBusClient(serviceBusConnectionString);
+                                ServiceBusSender sender = client.CreateSender(serviceBusQueueName);
 
                                     
                                 var messageBody = JsonConvert.SerializeObject(new { Email = userAccount.Email });
