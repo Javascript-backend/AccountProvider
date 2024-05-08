@@ -44,7 +44,25 @@ namespace AccountProvider.Functions
                 {
                     try
                     {
-                       
+                        string verificationApiUrl = Environment.GetEnvironmentVariable("verificationApiUrl")!;
+                        using var http = new HttpClient();
+                        StringContent content = new StringContent(JsonConvert.SerializeObject(new { vr }), Encoding.UTF8, "application/json");
+                        var response = await http.PostAsync(verificationApiUrl, content);
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var userAccount = await _userManager.FindByEmailAsync(vr.Email);
+                            if (userAccount != null)
+                            {
+                                userAccount.EmailConfirmed = true;
+                                await _userManager.UpdateAsync(userAccount);
+
+                                if (await _userManager.IsEmailConfirmedAsync(userAccount))
+                                {
+                                    return new OkResult();
+                                }
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
