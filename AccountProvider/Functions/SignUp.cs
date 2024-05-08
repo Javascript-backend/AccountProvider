@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -13,28 +14,28 @@ using System.Text;
 
 namespace AccountProvider.Functions
 {
-    public class SignUp(ILogger<SignUp> logger, UserManager<UserAccount> userManager)
+    public class SignUp(ILogger<SignUp> logger, UserManager<UserAccount> userManager, IConfiguration configuration)
     {
         private readonly ILogger<SignUp> _logger = logger;
         private readonly UserManager<UserAccount> _userManager = userManager;
-        
+        private readonly IConfiguration _configuration = configuration;
 
         [Function("SignUp")]
-        public async Task <IActionResult> Run([HttpTrigger(AuthorizationLevel.Function,"post")] HttpRequest req)
+        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
         {
             string body = null!;
             try
             {
                 body = await new StreamReader(req.Body).ReadToEndAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError($"StreamReader :: {ex.Message}");
             }
-            
-            
 
-            if(body != null)
+
+
+            if (body != null)
             {
                 UserRegistrationRequest urr = null!;
                 try
@@ -45,11 +46,11 @@ namespace AccountProvider.Functions
                 {
                     _logger.LogError($"JsonConvert.DeserializeObject<UserRegistrationRequest>(body) :: {ex.Message}");
                 }
-                
+
 
                 if (urr != null && !string.IsNullOrEmpty(urr.Email) && !string.IsNullOrEmpty(urr.Password))
                 {
-                    if(! await _userManager.Users.AnyAsync(x => x.Email == urr.Email))
+                    if (!await _userManager.Users.AnyAsync(x => x.Email == urr.Email))
                     {
                         var userAccount = new UserAccount
                         {
@@ -59,8 +60,9 @@ namespace AccountProvider.Functions
                             UserName = urr.Email
                         };
 
-                        string sbc = Environment.GetEnvironmentVariable("ServiceBus")!;
-                        string queue = Environment.GetEnvironmentVariable("Queue")!;
+                        string ServiceBus = _configuration["ServiceBus"]!;
+                        string queue = _configuration["Queue"]!;
+                        
 
                         var result = await _userManager.CreateAsync(userAccount, urr.Password);
                         if (result.Succeeded)
@@ -68,7 +70,7 @@ namespace AccountProvider.Functions
                             try
                             {
 
-                                ServiceBusClient client = new ServiceBusClient(sbc);
+                                ServiceBusClient client = new ServiceBusClient(ServiceBus);
                                 ServiceBusSender sender = client.CreateSender(queue);
 
 
@@ -85,11 +87,11 @@ namespace AccountProvider.Functions
                                 _logger.LogError($"Failed to send message to Service Bus: {ex.Message}");
                             }
                         }
-                        
+
                     }
                     else
                     {
-                        return new ConflictResult();    
+                        return new ConflictResult();
                     }
                 }
 
