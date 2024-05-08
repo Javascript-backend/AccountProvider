@@ -59,17 +59,17 @@ namespace AccountProvider.Functions
                             UserName = urr.Email
                         };
 
-                        string serviceBusConnectionString = Environment.GetEnvironmentVariable("ServiceBusConnectionString")!;
-                        string serviceBusQueueName = Environment.GetEnvironmentVariable("MessageQueueName")!;
-                        
+                        string sbc = Environment.GetEnvironmentVariable("ServiceBus")!;
+                        string queue = Environment.GetEnvironmentVariable("Queue")!;
+
                         var result = await _userManager.CreateAsync(userAccount, urr.Password);
                         if (result.Succeeded)
                         {
                             try
                             {
                                     
-                                ServiceBusClient client = new ServiceBusClient(serviceBusConnectionString);
-                                ServiceBusSender sender = client.CreateSender(serviceBusQueueName);
+                                ServiceBusClient client = new ServiceBusClient(sbc);
+                                ServiceBusSender sender = client.CreateSender(queue);
 
                                     
                                 var messageBody = JsonConvert.SerializeObject(new { Email = userAccount.Email });
