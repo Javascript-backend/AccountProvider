@@ -67,16 +67,16 @@ namespace AccountProvider.Functions
                         {
                             try
                             {
-                                    
-                                //ServiceBusClient client = new ServiceBusClient(sbc);
-                                //ServiceBusSender sender = client.CreateSender(queue);
 
-                                    
-                                //var messageBody = JsonConvert.SerializeObject(new { Email = userAccount.Email });
-                                //ServiceBusMessage message = new ServiceBusMessage(messageBody);
+                                ServiceBusClient client = new ServiceBusClient(sbc);
+                                ServiceBusSender sender = client.CreateSender(queue);
 
-                                    
-                                //await sender.SendMessageAsync(message);
+
+                                var messageBody = JsonConvert.SerializeObject(new { Email = userAccount.Email });
+                                ServiceBusMessage message = new ServiceBusMessage(messageBody);
+
+
+                                await sender.SendMessageAsync(message);
 
                                 return new OkResult();
                             }
