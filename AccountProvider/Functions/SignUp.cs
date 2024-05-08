@@ -60,7 +60,7 @@ namespace AccountProvider.Functions
                         };
 
                         string serviceBusConnectionString = Environment.GetEnvironmentVariable("ServiceBusConnectionString")!;
-                        string serviceBusQueueName = "verification_request";
+                        string serviceBusQueueName = Environment.GetEnvironmentVariable("MessageQueueName")!;
                         
                         var result = await _userManager.CreateAsync(userAccount, urr.Password);
                         if (result.Succeeded)
