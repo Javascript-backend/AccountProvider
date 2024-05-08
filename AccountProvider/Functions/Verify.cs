@@ -42,17 +42,17 @@ namespace AccountProvider.Functions
                     _logger.LogError($"JsonConvert.DeserializeObject<VerificationsRequest> :: {ex.Message}");
                 }
 
-                if (vr != null && !string.IsNullOrEmpty(vr.Email) && !string.IsNullOrEmpty(vr.VerificationCode))
+                if (vr != null && !string.IsNullOrEmpty(vr.Email) && !string.IsNullOrEmpty(vr.Code))
                 {
                     try
                     {
                         string verificationApiUrl = _configuration["verificationApiUrl"]!;
                         //string verificationApiUrl = Environment.GetEnvironmentVariable("verificationApiUrl")!;
                         using var http = new HttpClient();
-                        StringContent content = new StringContent(JsonConvert.SerializeObject(new { vr }), Encoding.UTF8, "application/json");
+                        StringContent content = new StringContent(JsonConvert.SerializeObject(vr), Encoding.UTF8, "application/json");
                         var response = await http.PostAsync(verificationApiUrl, content);
 
-                        if (true || response.IsSuccessStatusCode)
+                        if (response.IsSuccessStatusCode)
                         {
                             var userAccount = await _userManager.FindByEmailAsync(vr.Email);
                             if (userAccount != null)
