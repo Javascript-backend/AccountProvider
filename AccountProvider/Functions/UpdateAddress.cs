@@ -42,7 +42,7 @@ public class UpdateAddress(ILogger<UpdateAddress> logger, IServiceProvider servi
                 {
                     using var context = _serviceProvider.GetRequiredService<DataContext>();
 
-                    var exists = await context.UserAddresses.FirstOrDefaultAsync(x => x.AddressLine_1 == model.AddressLine_1 && x.PostalCode == model.PostalCode && x.City == model.City);
+                    var exists = await context.UserAddresses.FirstOrDefaultAsync(x => x.AddressLine_1 == model.AddressLine_1 && x.PostalCode == model.PostalCode && x.City == model.City && x.AddressLine_2 == model.AddressLine_2);
                     if (exists != null)
                     {
                         var user = await context.Users.FirstOrDefaultAsync(x => x.Id == model.UserId);
